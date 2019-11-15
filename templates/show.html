@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Offers</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+</head>
+
+<body>
+    <table class="table table-striped table-bordered table-sm">
+        <thead class="thead-dark">
+            <tr>
+                <th>Fiat Currency</th>
+                <th>Payment Method</th>
+                <th>Min Amount</th>
+                <th>Max Amount</th>
+                <th>Margin Percent</th>
+                <th>Total Available(BTC)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for offer in offers %}
+            <tr>
+                <td>{{ offer.fiat_currency }}</td>
+                <td>{{ offer.pay_method }}</td>
+                <td>{{ offer.min_amount }}</td>
+                <td>{{ offer.max_amount }}</td>
+                <td>{{ offer.margin_percent }}</td>
+                <td>{{ offer.avail_amount }}</td>
+                <td>
+                    <a href="/edit/{{ offer.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+                    <a href="/delete/{{ offer.id }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <center><a href="/offers" class="btn btn-primary">Add New Offer</a></center>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Update Offer</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+</head>
+
+<body>
+    <form method="POST" class="post-form" action="/update/{{offer.id}}">
+        {% csrf_token %}
+        <div class="container">
+            <br>
+            <div class="form-group row">
+                <label class="col-sm-1 col-form-label"></label>
+                <div class="col-sm-4">
+                    <h3>Update Details</h3>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Total Available(BTC):</label>
+                <div class="col-sm-4">
+                    <input type="number" name="final_offer" id="id_final_offer" required maxlength="15"
+                        value="{{ offer.avail_amount }}" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Fiat Currency:</label>
+                <div class="col-sm-4">
+                    <!-- <input type="text" name="fiat_currency" id="id_fiat_currency" required maxlength="20" -->
+                    <!-- value="{{ offer.fiat_currency }}" /> -->
+                    <select class="form-control" name="fiat_currency" id="id_fiat_currency" required maxlength="20"
+                        value="{{ offer.fiat_currency }}">
+                        <option>USD</option>
+                        <option>GBP</option>
+                        <option>EUR</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Payment Method:</label>
+                <div class="col-sm-4">
+                    <!-- <input type="text" name="pay_method" id="id_pay_method" required maxlength="100" -->
+                    <!-- value="{{ offer.pay_method }}" /> -->
+                    <select class="form-control" name="pay_method" id="id_pay_method" required maxlength="100"
+                        value="{{ offer.pay_method }}">
+                        <option>Amazon Gift Card</option>
+                        <option>Paypal</option>
+                        <option>Walmart Gift Card</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Min Amount:</label>
+                <div class="col-sm-4">
+                    <input type="number" name="min_amount" id="id_min_amount" required maxlength="254"
+                        value="{{ offer.min_amount }}" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Max Amount:</label>
+                <div class="col-sm-4">
+                    <input type="number" name="max_amount" id="id_max_amount" required maxlength="15"
+                        value="{{ offer.max_amount }}" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Margin Percentage:</label>
+                <div class="col-sm-4">
+                    <input type="number" name="margin_percent" id="id_margin_percent" required maxlength="15"
+                        value="{{ offer.margin_percent }}" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-1 col-form-label"></label>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-success">Update Offer</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>
