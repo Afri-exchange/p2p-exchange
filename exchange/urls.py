@@ -56,7 +56,7 @@ urlpatterns = [
             name='password_change'),
     re_path(r'^settings/password/done/$', auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
             name='password_change_done'),
-    path('edit/<int:id>', views.PostUpdateView.as_view()),
+    # path('edit/<int:id>', views.PostUpdateView.as_view()),
     path('update/<int:id>', views.PostUpdateView.as_view()),
     path('delete/<int:id>', views.destroy),
 ]
