@@ -18,7 +18,7 @@
             <th>Max Amount</th>
             <th>Margin Percent</th>
             <th>Total Available(BTC)</th>
-            <th>Actions</th>
+            <th>User</th>
         </tr>
     </thead>
     <tbody>
@@ -30,15 +30,9 @@
             <td>{{ offer.max_amount }}</td>
             <td>{{ offer.margin_percent }}</td>
             <td>{{ offer.avail_amount }}</td>
-            <td>
-                <a href="/edit/{{ offer.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
-                <a href="/delete/{{ offer.id }}">Delete</a>
-            </td>
+            <td>{{ offer.created_by }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<br>
-<br>
-<center><a href="/new" class="btn btn-primary">Add New Offer</a></center>
 {% endblock %}

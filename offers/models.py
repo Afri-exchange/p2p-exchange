@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -19,6 +19,8 @@ class Offers(models.Model):
     max_amount = models.IntegerField()
     margin_percent = models.IntegerField()
     avail_amount = models.FloatField()
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='offers')
 
     class Meta:
         db_table = "offers"
