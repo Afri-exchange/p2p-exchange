@@ -15,7 +15,7 @@ from django.views.generic import UpdateView
 class UserUpdateView(UpdateView):
     model = User
     fields = ('first_name', 'last_name', 'email', )
-    template_name = 'my_account.html'
+    template_name = 'jinja/my_account.html'
     success_url = reverse_lazy('my_account')
 
     def get_object(self):
@@ -31,4 +31,4 @@ def signup(request):
             return redirect('home')
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'jinja/signup.html', {'form': form})

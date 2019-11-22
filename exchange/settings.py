@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'lvah*3zjndq2=x3b_!@1@7w8^g+56d_p@$ahs^+djmr)6b*be('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     'widget_tweaks',
+    'crispy_forms',
 
     'accounts',
     'offers'
@@ -58,6 +59,18 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'exchange.urls'
 
 TEMPLATES = [
+    {'BACKEND': 'django.template.backends.jinja2.Jinja2',
+     'DIRS': [os.path.join(BASE_DIR, 'templates')],
+     'APP_DIRS': True,
+     'OPTIONS': {'environment': 'exchange.jinja2.environment',
+                 'context_processors': [
+                     'django.template.context_processors.debug',
+                     'django.template.context_processors.request',
+                     'django.contrib.auth.context_processors.auth',
+                     'django.contrib.messages.context_processors.messages',
+                 ],
+                 },
+     },
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
@@ -130,3 +143,4 @@ LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 # Create your models here.
 
@@ -21,7 +21,8 @@ class Offers(models.Model):
         max_length=50, choices=METHOD_PAY, default=METHOD_PAY[0][0])
     min_amount = models.PositiveIntegerField()
     max_amount = models.PositiveIntegerField()
-    margin_percent = models.PositiveSmallIntegerField()
+    margin_percent = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(100)])
     avail_amount = models.DecimalField(max_digits=19, decimal_places=8, validators=[
                                        MinValueValidator(Decimal('0.00000001'), message="Ensure this value is greater than or equal to 0.00000001.")])
     created_by = models.ForeignKey(
@@ -29,3 +30,22 @@ class Offers(models.Model):
 
     class Meta:
         db_table = "offers"
+
+
+class Bids(models.Model):
+    amount = models.PositiveIntegerField()
+    offer = models.ForeignKey(
+        Offers, on_delete=models.CASCADE, related_name='bids')
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='bids')
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = "bids"
+
+    def get_max_amount(self):
+        return self.offer.max_amount
+
+    def get_min_amount(self):
+        return self.offer.min_amount
