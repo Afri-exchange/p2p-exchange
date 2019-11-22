@@ -1,0 +1,52 @@
+{% extends "jinja/base.html" %}
+{% block title %}Offers{% endblock %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{{ static('css/style.css') }}" />
+<link rel="stylesheet" href="{{ static('css/bootstrap.min.css') }}" />
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb my-4 bg-dark">
+    <li class="breadcrumb-item active"><a href="{{ url('home') }}" class="text-white">Offers</a></li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th>Fiat Currency</th>
+            <th>Payment Method</th>
+            <th>Min Amount</th>
+            <th>Max Amount</th>
+            <th>Price Per BTC</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for offer in offers %}
+        <tr>
+            <td>{{ offer.fiat_currency }}</td>
+            <td>{{ offer.pay_method }}</td>
+            <td>{{ offer.min_amount }}</td>
+            <td>{{ offer.max_amount }}</td>
+            <td>{{ price * (offer.margin_percent + 100)}}</td>
+            {% if user.is_authenticated %}
+            {% if offer.created_by == user %}
+            <td>
+                <a href="/offer/{{ offer.id }}/new" class="btn btn-outline-success btn-sm disabled">Make bid</a>
+                <a href="/offer/{{ offer.id }}" class="btn btn-outline-info btn-sm">View bids</a></td>
+            {% else%}
+            <td><a href="/offer/{{ offer.id }}/new" class="btn btn-outline-success btn-sm">Make bid</a>
+                <a href="/offer/{{ offer.id }}" class="btn btn-outline-info btn-sm">View bids</a></td>
+            {% endif%}
+            {% else%}
+            <td><a href="/offer/{{ offer.id }}/new" class="btn btn-outline-success btn-sm disabled">Make bid</a>
+                <a href="/offer/{{ offer.id }}" class="btn btn-outline-info btn-sm">View bids</a></td>
+            {% endif%}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

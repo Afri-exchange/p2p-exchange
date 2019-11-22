@@ -1,10 +1,15 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Offers{% endblock %}
+{% extends 'jinja/base.html' %}
+{% block title %}My Offers{% endblock %}
 
 {% block stylesheet %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}" />
-<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+<link rel="stylesheet" href="{{ static('css/style.css') }}" />
+<link rel="stylesheet" href="{{ static('css/bootstrap.min.css') }}" />
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb my-4 bg-dark">
+    <li class="breadcrumb-item active"><a href="{{ url('offers') }}" class="text-white">My Offers</a></li>
+</ol>
 {% endblock %}
 
 
@@ -31,8 +36,9 @@
             <td>{{ offer.margin_percent }}</td>
             <td>{{ offer.avail_amount }}</td>
             <td>
-                <a href="/update/{{ offer.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
-                <a href="/delete/{{ offer.id }}">Delete</a>
+                <a href="/update/{{ offer.id }}" class="btn btn-outline-success btn-sm">Edit</a>
+                <a href="/delete/{{ offer.id }}" class="btn btn-outline-danger btn-sm">Delete</a>
+                <a href="/offer/{{ offer.id }}" class="btn btn-outline-info btn-sm">View bids</a>
             </td>
         </tr>
         {% endfor %}

@@ -1,17 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'jinja/base.html' %}
 
 {% block title %}My account{% endblock %}
 
-{% block breadcrumb %}
+{% block breadcrumbb %}
 <li class="breadcrumb-item active">My account</li>
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb my-4 bg-dark">
+    <li class="breadcrumb-item active text-white">My account</li>
+</ol>
 {% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-6 col-md-8 col-sm-10">
         <form method="post" novalidate>
-            {% csrf_token %}
-            {% include 'includes/form.html' %}
+            {{ csrf_input }}
+            {% include 'jinja/includes/form.html' %}
             <button type="submit" class="btn btn-success">Save changes</button>
         </form>
     </div>

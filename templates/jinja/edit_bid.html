@@ -1,0 +1,28 @@
+{% extends 'jinja/base.html' %}
+{% block title %}Update Bid{% endblock %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{{ static('css/style.css') }}" />
+<link rel="stylesheet" href="{{ static('css/bootstrap.min.css') }}" />
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb my-4 bg-dark">
+    <li class="breadcrumb-item"><a href="{{ url('home') }}" class="text-white">Offers</a></li>
+    <li class="breadcrumb-item text-white"><a href="/offer/{{ bid.offer.pk }}" class="text-white"> Offer Bids</a></li>
+    <li class="breadcrumb-item active text-white">Edit Bid</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 col-md-8 col-sm-10">
+        <form method="POST" class="post-form" action="/bid/{{bid.id}}/edit/" novalidate>
+            {{ csrf_input }}
+            {% include 'jinja/includes/form.html' %}
+            <button type="submit" class="btn btn-success">Save changes</button>
+            <a href="/offer/{{ bid.offer.pk }}" class="btn btn-outline-secondary" role="button">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

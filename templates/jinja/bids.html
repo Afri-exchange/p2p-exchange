@@ -1,0 +1,51 @@
+{% extends "jinja/base.html" %}
+{% block title %}Bids{% endblock %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{{ static('css/style.css') }}" />
+<link rel="stylesheet" href="{{ static('css/bootstrap.min.css') }}" />
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb my-4 bg-dark">
+    <li class="breadcrumb-item"><a href="{{ url('home') }}" class="text-white">Offers</a></li>
+    <li class="breadcrumb-item active text-white">Offer Bids</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<table class="table table-striped table-bordered table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th>Amount</th>
+            <th>Created on</th>
+            <th>Updated on</th>
+            <th>Created by</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for offer in bids %}
+        <tr>
+            <td>{{ offer.amount }}</td>
+            <td>{{ naturaltime(offer.created_at) }}</td>
+            <td>{{ naturaltime(offer.last_updated) }}</td>
+            <td>{{ offer.created_by }}</td>
+            {% if user.is_authenticated %}
+            {% if offer.offer.created_by == user %}
+            <td><a href="#" class="btn btn-outline-success btn-sm">Accept</a>
+                <a href="#" class="btn btn-outline-danger btn-sm">Decline</a></td>
+            {% elif offer.created_by == user %}
+            <td><a href="/bid/{{offer.id}}/edit" class="btn btn-outline-primary btn-sm">Update</a>
+                <a href="/bid/delete/{{ offer.id }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+            {% else%}
+            <td><i>No Action Available</i></td>
+            {% endif%}
+            {% else%}
+            <td><i>No Action Available</i></td>
+            {% endif%}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
