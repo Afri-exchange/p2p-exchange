@@ -26,6 +26,7 @@ urlpatterns = [
     path('new', views.CreateOfferView.as_view(), name='create_offer'),
     # path('offers', views.show, name='offers'),
     path('offers', views.UserOfferView.as_view(), name='offers'),
+    path('bids', views.UserBidsView.as_view(), name='bids'),
     # path('', views.showall, name='home'),
     path('', views.ShowOffersView.as_view(), name='home'),
 
@@ -62,6 +63,8 @@ urlpatterns = [
             name='password_change_done'),
     
     re_path(r'offer/(?P<id>\d+)/$', views.BidListView.as_view(), name='view_bids'),
+    re_path(r'offerbids/(?P<id>\d+)/$',
+            views.UserOfferBidListView.as_view(), name='offer_bids'),
     re_path(r'offer/(?P<id>\d+)/new/$',
             views.CreateBidView.as_view(), name='new_bid'),
     re_path(r'bid/(?P<bid_id>\d+)/edit/$',
@@ -69,6 +72,8 @@ urlpatterns = [
     # path('edit/<int:id>', views.PostUpdateView.as_view()),
     path('update/<int:id>', views.OfferUpdateView.as_view(), name='update_offer'),
     # path('delete/<int:id>', views.destroy),
+    path('accept/<int:id>', views.OwnerAcceptBid, name='accept_bid'),
+    path('decline/<int:id>', views.OwnerDeclineBid, name='decline_bid'),
     path('delete/<int:id>', views.OfferDeleteView.as_view(), name='delete_offer'),
     re_path(r'bid/delete/(?P<id>\d+)/$', views.BidDeleteView.as_view(), name='delete_bid'),
 ]

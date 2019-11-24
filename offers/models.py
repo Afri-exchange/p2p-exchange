@@ -33,6 +33,11 @@ class Offers(models.Model):
 
 
 class Bids(models.Model):
+    STATES = (
+        ('OPEN', 'OPEN'),
+        ('ACCEPTED', 'ACCEPTED'),
+        ('DECLINED', 'DECLINED'),
+    )
     amount = models.PositiveIntegerField()
     offer = models.ForeignKey(
         Offers, on_delete=models.CASCADE, related_name='bids')
@@ -40,6 +45,8 @@ class Bids(models.Model):
         User, on_delete=models.CASCADE, related_name='bids')
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(null=True)
+    status = models.CharField(
+        max_length=8, choices=STATES, default=STATES[0][0])
 
     class Meta:
         db_table = "bids"

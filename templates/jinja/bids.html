@@ -18,9 +18,10 @@
     <thead class="thead-dark">
         <tr>
             <th>Amount</th>
-            <th>Created on</th>
-            <th>Updated on</th>
+            <th>Created </th>
+            <th>Updated </th>
             <th>Created by</th>
+            <th>Status </th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -31,13 +32,23 @@
             <td>{{ naturaltime(offer.created_at) }}</td>
             <td>{{ naturaltime(offer.last_updated) }}</td>
             <td>{{ offer.created_by }}</td>
+            <td>{{ offer.status }}</td>
             {% if user.is_authenticated %}
             {% if offer.offer.created_by == user %}
-            <td><a href="#" class="btn btn-outline-success btn-sm">Accept</a>
-                <a href="#" class="btn btn-outline-danger btn-sm">Decline</a></td>
+            {% if offer.status == "OPEN" %}
+            <td><a href="/accept/{{offer.id}}" class="btn btn-outline-success btn-sm">Accept</a>
+                <a href="/decline/{{offer.id}}" class="btn btn-outline-danger btn-sm">Decline</a></td>
+            {% else %}
+            <td>This offer has been {{ offer.status.lower() }}</td>
+            {% endif %}
             {% elif offer.created_by == user %}
+            {% if offer.status == "OPEN" %}
             <td><a href="/bid/{{offer.id}}/edit" class="btn btn-outline-primary btn-sm">Update</a>
                 <a href="/bid/delete/{{ offer.id }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+            {% else %}
+            <td><a href="#" class="btn btn-outline-primary btn-sm disabled">Update</a>
+                <a href="/bid/delete/{{ offer.id }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+            {% endif %}
             {% else%}
             <td><i>No Action Available</i></td>
             {% endif%}
@@ -48,4 +59,11 @@
         {% endfor %}
     </tbody>
 </table>
+<br>
+<br>
+{% if user.is_authenticated %}
+{% if offer.created_by != user %}
+<center><a href="/offer/{{ offer.id }}/new" class="btn btn-primary">Add New Bid</a></center>
+{% endif %}
+{% endif %}
 {% endblock %}

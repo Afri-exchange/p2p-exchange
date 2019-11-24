@@ -21,6 +21,7 @@
             <th>Min Amount</th>
             <th>Max Amount</th>
             <th>Price Per BTC</th>
+            <th>No of Bids</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -32,6 +33,7 @@
             <td>{{ offer.min_amount }}</td>
             <td>{{ offer.max_amount }}</td>
             <td>{{ price * (offer.margin_percent + 100)}}</td>
+            <td>{{ offer.bids.count() }}</td>
             {% if user.is_authenticated %}
             {% if offer.created_by == user %}
             <td>

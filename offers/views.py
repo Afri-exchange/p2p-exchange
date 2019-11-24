@@ -86,6 +86,12 @@ class BidUpdateView(UpdateView):
     pk_url_kwarg = 'bid_id'
     context_object_name = 'bid'
 
+    def get_object(self, *args, **kwargs):
+        bid = super(BidUpdateView, self).get_object(*args, **kwargs)
+        if bid.status != "OPEN":
+            raise Http404("No bids found matching the query")
+        return bid
+
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(created_by=self.request.user)
@@ -118,6 +124,30 @@ class BidDeleteView(DeleteView):
         self.bid.delete()
         return HttpResponseRedirect(reverse('view_bids', kwargs={'id': pk}))
 
+@login_required
+def OwnerAcceptBid(request, id):
+    bid = get_object_or_404(Bids, pk=id)
+    if bid.offer.created_by != request.user:
+        raise Http404("No bids found matching the query")
+    if bid.status != "OPEN":
+        raise Http404("No bids found matching the query")
+    pk = bid.offer.pk
+    bid.status = "ACCEPTED"
+    bid.save()
+    return HttpResponseRedirect(reverse('view_bids', kwargs={'id': pk}))
+
+@login_required
+def OwnerDeclineBid(request, id):
+    bid = get_object_or_404(Bids, pk=id)
+    if bid.offer.created_by != request.user:
+        raise Http404("No bids found matching the query")
+    if bid.status != "OPEN":
+        raise Http404("No bids found matching the query")
+    pk = bid.offer.pk
+    bid.status = "DECLINED"
+    bid.save()
+    return HttpResponseRedirect(reverse('view_bids', kwargs={'id': pk}))
+
 # @method_decorator(login_required, name='dispatch')
 class BidListView(ListView):
     model = Bids
@@ -133,6 +163,36 @@ class BidListView(ListView):
         self.offer = get_object_or_404(Offers, pk=self.kwargs.get('id'))
         queryset = self.offer.bids.order_by('-last_updated')
         return queryset
+
+@method_decorator(login_required, name='dispatch')
+class UserOfferBidListView(ListView):
+    model = Bids
+    context_object_name = 'bids'
+    template_name = 'jinja/offer_bids.html'
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        kwargs['offer'] = self.offer
+        return super().get_context_data(**kwargs)
+
+    def get_queryset(self):
+        self.offer = get_object_or_404(Offers, pk=self.kwargs.get('id'))
+        if self.offer.created_by != self.request.user:
+            raise Http404("No offers found matching the query")
+        queryset = self.offer.bids.order_by('-last_updated')
+        return queryset
+
+@method_decorator(login_required, name='dispatch')
+class UserBidsView(ListView):
+    model = Bids
+    context_object_name = 'bids'
+    template_name = 'jinja/my_bids.html'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(created_by=self.request.user)
+        return queryset.order_by('-last_updated')
 
 class ShowOffersView(ListView):
     model = Offers

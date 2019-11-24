@@ -23,6 +23,7 @@
             <th>Max Amount</th>
             <th>Margin Percent</th>
             <th>Total Available(BTC)</th>
+            <th>No of Bids</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -35,10 +36,11 @@
             <td>{{ offer.max_amount }}</td>
             <td>{{ offer.margin_percent }}</td>
             <td>{{ offer.avail_amount }}</td>
+            <td>{{ offer.bids.count() }}</td>
             <td>
                 <a href="/update/{{ offer.id }}" class="btn btn-outline-success btn-sm">Edit</a>
                 <a href="/delete/{{ offer.id }}" class="btn btn-outline-danger btn-sm">Delete</a>
-                <a href="/offer/{{ offer.id }}" class="btn btn-outline-info btn-sm">View bids</a>
+                <a href="/offerbids/{{ offer.id }}" class="btn btn-outline-info btn-sm">View bids</a>
             </td>
         </tr>
         {% endfor %}

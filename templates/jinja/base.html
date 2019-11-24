@@ -19,6 +19,10 @@
                     <a class="nav-link" href="{{ url('offers') }}">My Offers {% if request.path == '/offers' %}<span
                             class="sr-only">(current)</span>{% endif %}</a>
                 </li>
+                <li class={% if request.path == '/bids' %} "nav-item active" {% endif %}>
+                    <a class="nav-link" href="{{ url('bids') }}">My Bids {% if request.path == '/bids' %}<span
+                            class="sr-only">(current)</span>{% endif %} </a>
+                </li>
                 <li class={% if request.path == '/' %} "nav-item active" {% endif %}>
                     <a class="nav-link" href="{{ url('home') }}">All Offers {% if request.path == '/' %}<span
                             class="sr-only">(current)</span>{% endif %} </a>
