@@ -20,6 +20,7 @@
             <th>Created </th>
             <th>Updated </th>
             <th>Offer Owner</th>
+            <th>BTC Amount</th>
             <th>Status </th>
             <th>Actions</th>
         </tr>
@@ -31,6 +32,7 @@
             <td>{{ naturaltime(offer.created_at) }}</td>
             <td>{{ naturaltime(offer.last_updated) }}</td>
             <td>{{ offer.offer.created_by }}</td>
+            <td>{{ "%0.8f" | format(offer.amount / (price * (offer.offer.margin_percent + 100))) }}</td>
             <td>{{ offer.status }}</td>
             {% if user.is_authenticated %}
             {% if offer.offer.created_by == user %}

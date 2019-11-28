@@ -10,6 +10,11 @@
 <ol class="breadcrumb my-4 bg-dark">
     <li class="breadcrumb-item active"><a href="{{ url('offers') }}" class="text-white">My Offers</a></li>
 </ol>
+<div class="text-right">
+    <h3>
+        <small class="text-muted">Balance: {{ acc.acc_balance }}</small>
+    </h3>
+</div>
 {% endblock %}
 
 
@@ -22,7 +27,6 @@
             <th>Min Amount</th>
             <th>Max Amount</th>
             <th>Margin Percent</th>
-            <th>Total Available(BTC)</th>
             <th>No of Bids</th>
             <th>Actions</th>
         </tr>
@@ -35,7 +39,6 @@
             <td>{{ offer.min_amount }}</td>
             <td>{{ offer.max_amount }}</td>
             <td>{{ offer.margin_percent }}</td>
-            <td>{{ offer.avail_amount }}</td>
             <td>{{ offer.bids.count() }}</td>
             <td>
                 <a href="/update/{{ offer.id }}" class="btn btn-outline-success btn-sm">Edit</a>

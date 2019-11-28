@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from accounts.models import Accounts
 from django.views.generic import UpdateView
 
 
@@ -28,6 +29,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
+            Accounts.objects.create(acc_balance=3, owned_by=user)
             return redirect('home')
     else:
         form = SignUpForm()

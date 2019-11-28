@@ -4,12 +4,14 @@ from django.shortcuts import render, HttpResponse, get_object_or_404, redirect, 
 from django.urls import reverse_lazy
 # Create your views here.
 from offers.forms import OfferForm
+from accounts.models import Accounts
 from offers.models import Offers, Bids
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import UpdateView, ListView, CreateView, DeleteView
 import requests
-TICKER_API_URL = 'https://api.coinmarketcap.com/v1/ticker/'
+from decimal import Decimal
+TICKER_API_URL = 'http://api.coinmarketcap.com/v1/ticker/'
 # Create your views here.
 
 
@@ -20,7 +22,7 @@ def error_404_view(request, exception):
 @method_decorator(login_required, name='dispatch')
 class OfferUpdateView(UpdateView):
     model = Offers
-    fields = ('avail_amount', 'fiat_currency', 'pay_method',
+    fields = ('fiat_currency', 'pay_method',
               'min_amount', 'max_amount', 'margin_percent')
     template_name = 'jinja/edit.html'
     pk_url_kwarg = 'id'
@@ -41,9 +43,14 @@ class OfferUpdateView(UpdateView):
 @method_decorator(login_required, name='dispatch')
 class CreateOfferView(CreateView):
     model = Offers
-    fields = ['avail_amount', 'fiat_currency', 'pay_method',
+    fields = ['fiat_currency', 'pay_method',
               'min_amount', 'max_amount', 'margin_percent']
     template_name = 'jinja/index.html'
+
+    def get_initial(self):
+        acc = get_object_or_404(Accounts, owned_by=self.request.user)
+        if acc.acc_balance == 0:
+            raise Http404("Not enough Balance")
 
     def form_valid(self, form):
         offer = form.save(commit=False)
@@ -131,7 +138,19 @@ def OwnerAcceptBid(request, id):
         raise Http404("No bids found matching the query")
     if bid.status != "OPEN":
         raise Http404("No bids found matching the query")
+    acc = get_object_or_404(Accounts, owned_by=request.user)
+    if acc.acc_balance == 0:
+        raise Http404("Not enough Balance")
     pk = bid.offer.pk
+    margin = bid.offer.margin_percent
+    bid_amount = bid.amount
+    price = round(get_latest_crypto_price('bitcoin'))
+    amount = bid_amount / (price * (margin + 100))
+    acc.acc_balance -= Decimal(amount)
+    acc.save()
+    escrow = get_object_or_404(Accounts, id=3)
+    escrow.acc_balance += Decimal(amount)
+    escrow.save()
     bid.status = "ACCEPTED"
     bid.save()
     return HttpResponseRedirect(reverse('view_bids', kwargs={'id': pk}))
@@ -156,6 +175,7 @@ class BidListView(ListView):
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
+        kwargs['price'] = round(get_latest_crypto_price('bitcoin'))
         kwargs['offer'] = self.offer
         return super().get_context_data(**kwargs)
 
@@ -172,6 +192,7 @@ class UserOfferBidListView(ListView):
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
+        kwargs['price'] = round(get_latest_crypto_price('bitcoin'))
         kwargs['offer'] = self.offer
         return super().get_context_data(**kwargs)
 
@@ -188,6 +209,11 @@ class UserBidsView(ListView):
     context_object_name = 'bids'
     template_name = 'jinja/my_bids.html'
     paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['price'] = round(get_latest_crypto_price('bitcoin'))
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -210,6 +236,11 @@ class UserOfferView(ListView):
     model = Offers
     context_object_name = 'offers'
     template_name = 'jinja/show.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['acc'] = get_object_or_404(Accounts, owned_by=self.request.user)
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()

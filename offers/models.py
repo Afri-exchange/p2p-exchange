@@ -23,8 +23,6 @@ class Offers(models.Model):
     max_amount = models.PositiveIntegerField()
     margin_percent = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(100)])
-    avail_amount = models.DecimalField(max_digits=19, decimal_places=8, validators=[
-                                       MinValueValidator(Decimal('0.00000001'), message="Ensure this value is greater than or equal to 0.00000001.")])
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='offers')
 
