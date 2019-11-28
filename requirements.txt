@@ -1,3 +1,6 @@
 django
 django-widget-tweaks
 django-crispy-forms
+requests
+jinja2
+django-jinja
