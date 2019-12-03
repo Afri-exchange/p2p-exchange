@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.utils.translation import gettext_lazy as _
+from django import forms
 # Create your models here.
 
 
@@ -49,8 +52,20 @@ class Bids(models.Model):
     class Meta:
         db_table = "bids"
 
-    def get_max_amount(self):
-        return self.offer.max_amount
+    # def clean(self):
+    #     self.offer = 
+    #     if self.amount > self.offer.max_amount:
+    #         raise ValidationError(
+    #             {'amount': _("Bid can't be greater than {}".format(self.offer.max_amount))})
+    #     if self.amount < self.offer.min_amount:
+    #         raise ValidationError(
+    #             {'amount': _("Bid can't be less than {}".format(self.offer.min_amount))})
 
-    def get_min_amount(self):
-        return self.offer.min_amount
+    def validate_amount(self):
+        if self.amount > self.offer.max_amount:
+            raise ValidationError([
+                {NON_FIELD_ERRORS: _("Bid can't be greater than {}".format(self.offer.max_amount))}])
+        if self.amount < self.offer.min_amount:
+            raise ValidationError([
+                {NON_FIELD_ERRORS: _("Bid can't be less than {}".format(self.offer.min_amount))}])
+

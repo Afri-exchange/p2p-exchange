@@ -1,4 +1,8 @@
 from django.http import Http404
+# from django.forms.util import ErrorList
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.utils.translation import gettext_lazy as _
+from django import forms
 from django.utils import timezone
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect, reverse, HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -80,6 +84,11 @@ class CreateBidView(CreateView):
         bid = form.save(commit=False)
         bid.created_by = self.request.user
         bid.offer = self.offer
+        try:
+            bid.validate_amount()
+        except ValidationError as e:
+            form.add_error('amount',e)
+            return self.form_invalid(form)
         bid.last_updated = timezone.now()
         bid.save()
         return redirect('view_bids', id=self.offer.pk)
@@ -105,6 +114,11 @@ class BidUpdateView(UpdateView):
 
     def form_valid(self, form):
         bid = form.save(commit=False)
+        try:
+            bid.validate_amount()
+        except ValidationError as e:
+            form.add_error('amount', e)
+            return self.form_invalid(form)
         bid.last_updated = timezone.now()
         bid.save()
         return redirect('view_bids', id=bid.offer.pk)
