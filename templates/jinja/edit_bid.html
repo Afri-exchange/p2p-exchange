@@ -15,14 +15,62 @@
 {% endblock %}
 
 {% block content %}
+<div class="alert alert-primary" role="alert">
+    {{ warn }}
+</div>
+<div class="alert alert-primary" role="alert" id="test">
+    {{ price }}
+</div>
 <div class="row">
     <div class="col-lg-6 col-md-8 col-sm-10">
         <form method="POST" class="post-form" action="/bid/{{bid.id}}/edit/" novalidate>
             {{ csrf_input }}
-            {% include 'jinja/includes/form.html' %}
+            {% if form.non_field_errors() %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors() %}
+                <p{% if loop.last %} class="mb-0" {% endif %}>{{ error }}</p>
+                    {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-row">
+                <label for="id_amount" class=" requiredField">
+                    Amount<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend" style="height: 38px;">
+                        <div class="input-group-text">ETH</div>
+                    </div>
+                    {{ as_crispy_field(form.amount, label_class="sr-only", field_class="") }}
+                </div>
+            </div>
+            <div class="alert alert-warning" id="tester">
+                <strong id="report"></strong>
+            </div>
             <button type="submit" class="btn btn-success">Save changes</button>
             <a href="/offer/{{ bid.offer.pk }}" class="btn btn-outline-secondary" role="button">Cancel</a>
         </form>
     </div>
 </div>
+<script>
+    //let doc = document.getElementsByTagName("BODY")[0];
+    let btc_amount = document.getElementById("id_amount");
+    let err = document.getElementById("report");
+    let test = document.getElementById("test");
+    let tester = document.getElementById("tester");
+
+    document.addEventListener("readystatechange", function () {
+        tester.style.display = "block";
+        let text = test.textContent;
+        let pr = Number(text.split("$")[1])
+        let res = btc_amount.value * pr;
+        err.innerHTML = btc_amount.value + " ETH = $" + res;
+    });
+    btc_amount.addEventListener("input", function () {
+        tester.style.display = "block";
+        let text = test.textContent;
+        let pr = Number(text.split("$")[1])
+        let res = btc_amount.value * pr;
+        err.innerHTML = btc_amount.value + " ETH = $" + res;
+    });
+</script>
 {% endblock %}

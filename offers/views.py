@@ -36,8 +36,19 @@ class OfferUpdateView(UpdateView):
         queryset = super().get_queryset()
         return queryset.filter(created_by=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        price = round(get_latest_crypto_price('ethereum'))
+        context['price'] = "The price of 1 ethereum is ${}".format(price)
+        return context
+
     def form_valid(self, form):
         offer = form.save(commit=False)
+        try:
+            offer.validate_min_amount()
+        except ValidationError as e:
+            form.add_error('min_amount', e)
+            return self.form_invalid(form)
         # post.updated_by = self.request.user
         # post.updated_at = timezone.now()
         offer.save()
@@ -56,8 +67,19 @@ class CreateOfferView(CreateView):
         if acc.acc_balance == 0:
             raise Http404("Not enough Balance")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        price = round(get_latest_crypto_price('ethereum'))
+        context['price'] = "The price of 1 ethereum is ${}".format(price)
+        return context
+
     def form_valid(self, form):
         offer = form.save(commit=False)
+        try:
+            offer.validate_min_amount()
+        except ValidationError as e:
+            form.add_error('min_amount', e)
+            return self.form_invalid(form)
         offer.created_by = self.request.user
         offer.save()
         return redirect('offers')
@@ -77,6 +99,10 @@ class CreateBidView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['offer'] = get_object_or_404(Offers, pk=self.kwargs.get('id'))
+        feed = get_object_or_404(Offers, pk=self.kwargs.get('id'))
+        price = round(get_latest_crypto_price('ethereum'))
+        context['price'] = "The price of 1 ethereum is ${}".format(price)
+        context['warn'] = "The amount should be within the range of {} and {}".format(feed.min_amount, feed.max_amount)
         return context
 
     def form_valid(self, form):
@@ -91,6 +117,10 @@ class CreateBidView(CreateView):
             return self.form_invalid(form)
         bid.last_updated = timezone.now()
         bid.save()
+        acc = get_object_or_404(Accounts, owned_by=self.offer.created_by)
+        acc.escrow_balance += bid.amount
+        acc.acc_balance -= bid.amount
+        acc.save()
         return redirect('view_bids', id=self.offer.pk)
 
 
@@ -107,6 +137,14 @@ class BidUpdateView(UpdateView):
         if bid.status != "OPEN":
             raise Http404("No bids found matching the query")
         return bid
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        feed = get_object_or_404(Bids, pk=self.kwargs.get('bid_id'))
+        context['warn'] = "The amount should be within the range of {} and {}".format(feed.offer.min_amount, feed.offer.max_amount)
+        price = round(get_latest_crypto_price('ethereum'))
+        context['price'] = "The price of 1 ethereum is ${}".format(price)
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -141,6 +179,13 @@ class BidDeleteView(DeleteView):
         self.bid = get_object_or_404(Bids, pk=self.kwargs.get('id'))
         if self.bid.created_by != self.request.user:
             raise Http404("No bids found matching the query")
+        if self.bid.status == "ACCEPTED":
+            raise Http404("No bids found matching the query")
+        if self.bid.status == "OPEN":
+            acc = get_object_or_404(Accounts, owned_by=self.bid.offer.created_by)
+            acc.escrow_balance -= self.bid.amount
+            acc.acc_balance += self.bid.amount
+            acc.save()
         pk = self.bid.offer.pk
         self.bid.delete()
         return HttpResponseRedirect(reverse('view_bids', kwargs={'id': pk}))
@@ -156,15 +201,15 @@ def OwnerAcceptBid(request, id):
     if acc.acc_balance == 0:
         raise Http404("Not enough Balance")
     pk = bid.offer.pk
-    margin = bid.offer.margin_percent
+    # margin = bid.offer.margin_percent
     bid_amount = bid.amount
-    price = round(get_latest_crypto_price('bitcoin'))
-    amount = bid_amount / (price * (margin + 100))
-    acc.acc_balance -= Decimal(amount)
+    acc2 = get_object_or_404(Accounts, owned_by=bid.created_by)
+    # price = round(get_latest_crypto_price('ethereum'))
+    # amount = bid_amount / (price * (margin + 100))
+    acc.escrow_balance -= bid_amount
     acc.save()
-    escrow = get_object_or_404(Accounts, id=3)
-    escrow.acc_balance += Decimal(amount)
-    escrow.save()
+    acc2.acc_balance += bid_amount
+    acc2.save()
     bid.status = "ACCEPTED"
     bid.save()
     return HttpResponseRedirect(reverse('view_bids', kwargs={'id': pk}))
@@ -176,6 +221,10 @@ def OwnerDeclineBid(request, id):
         raise Http404("No bids found matching the query")
     if bid.status != "OPEN":
         raise Http404("No bids found matching the query")
+    acc = get_object_or_404(Accounts, owned_by=request.user)
+    acc.escrow_balance -= bid.amount
+    acc.acc_balance += bid.amount
+    acc.save()
     pk = bid.offer.pk
     bid.status = "DECLINED"
     bid.save()
@@ -189,7 +238,7 @@ class BidListView(ListView):
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
-        kwargs['price'] = round(get_latest_crypto_price('bitcoin'))
+        kwargs['price'] = round(get_latest_crypto_price('ethereum'))
         kwargs['offer'] = self.offer
         return super().get_context_data(**kwargs)
 
@@ -206,7 +255,7 @@ class UserOfferBidListView(ListView):
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
-        kwargs['price'] = round(get_latest_crypto_price('bitcoin'))
+        kwargs['price'] = round(get_latest_crypto_price('ethereum'))
         kwargs['offer'] = self.offer
         return super().get_context_data(**kwargs)
 
@@ -226,7 +275,7 @@ class UserBidsView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['price'] = round(get_latest_crypto_price('bitcoin'))
+        context['price'] = round(get_latest_crypto_price('ethereum'))
         return context
 
     def get_queryset(self):
@@ -241,7 +290,7 @@ class ShowOffersView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['price'] = round(get_latest_crypto_price('bitcoin'))
+        context['price'] = round(get_latest_crypto_price('ethereum'))
         return context
 
 
@@ -273,6 +322,22 @@ class OfferDeleteView(DeleteView):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(created_by=self.request.user)
+    
+    def delete(self, request, *args, **kwargs):
+        # pk = self.kwargs['pk']
+        self.offer = get_object_or_404(Offers, pk=self.kwargs.get('id'))
+        if self.offer.created_by != self.request.user:
+            raise Http404("No offers found matching the query")
+        for bid in self.offer.bids.all():
+            if bid.status == "OPEN":
+                acc = get_object_or_404(
+                    Accounts, owned_by=bid.offer.created_by)
+                acc.escrow_balance -= bid.amount
+                acc.acc_balance += bid.amount
+                acc.save()
+        self.offer.delete()
+        return HttpResponseRedirect(reverse('offers'))
+
 
 
 def get_latest_crypto_price(crypto):

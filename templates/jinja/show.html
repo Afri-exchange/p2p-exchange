@@ -12,7 +12,8 @@
 </ol>
 <div class="text-right">
     <h3>
-        <small class="text-muted">Balance: {{ acc.acc_balance }}</small>
+        <small class="text-muted">Escrow: {{ "%0.8f" | format(acc.escrow_balance) }} Balance:
+            {{ "%0.8f" | format(acc.acc_balance) }}</small>
     </h3>
 </div>
 {% endblock %}
@@ -24,8 +25,8 @@
         <tr>
             <th>Fiat Currency</th>
             <th>Payment Method</th>
-            <th>Min Amount</th>
-            <th>Max Amount</th>
+            <th>Min Amount (ETH)</th>
+            <th>Max Amount (ETH)</th>
             <th>Margin Percent</th>
             <th>No of Bids</th>
             <th>Actions</th>

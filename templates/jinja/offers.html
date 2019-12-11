@@ -18,9 +18,9 @@
         <tr>
             <th>Fiat Currency</th>
             <th>Payment Method</th>
-            <th>Min Amount</th>
-            <th>Max Amount</th>
-            <th>Price Per BTC</th>
+            <th>Min Amount (USD)</th>
+            <th>Max Amount (USD)</th>
+            <th>Price Per ETH</th>
             <th>No of Bids</th>
             <th>Actions</th>
         </tr>
@@ -30,9 +30,9 @@
         <tr>
             <td>{{ offer.fiat_currency }}</td>
             <td>{{ offer.pay_method }}</td>
-            <td>{{ offer.min_amount }}</td>
-            <td>{{ offer.max_amount }}</td>
-            <td>{{ price * (offer.margin_percent + 100)}}</td>
+            <td>{{ "%0.0f" | format((offer.min_amount|float()) * (price * ((offer.margin_percent + 100) / 100))) }}</td>
+            <td>{{ "%0.0f" | format((offer.max_amount|float()) * (price * ((offer.margin_percent + 100) / 100))) }}</td>
+            <td>{{ "%0.0f" | format(price * ((offer.margin_percent + 100) / 100))}}</td>
             <td>{{ offer.bids.count() }}</td>
             {% if user.is_authenticated %}
             {% if offer.created_by == user %}

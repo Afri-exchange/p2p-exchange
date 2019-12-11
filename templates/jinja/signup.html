@@ -10,7 +10,32 @@
                 <h3 class="card-title">Sign up</h3>
                 <form method="post" novalidate>
                     {{ csrf_input }}
-                    {% include 'jinja/includes/form.html' %}
+                    {% if form.non_field_errors() %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors() %}
+                        <p{% if loop.last %} class="mb-0" {% endif %}>{{ error }}</p>
+                            {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                    <div class="form-group">
+                        {{ as_crispy_field(field) }}
+                    </div>
+                    {% endfor %}
+                    {% if form1.non_field_errors() %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form1.non_field_errors() %}
+                        <p{% if loop.last %} class="mb-0" {% endif %}>{{ error }}</p>
+                            {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% for field in form1 %}
+                    <div class="form-group">
+                        {{ as_crispy_field(field) }}
+                    </div>
+                    {% endfor %}
                     <button type="submit" class="btn btn-primary btn-block">Create an account</button>
                 </form>
             </div>

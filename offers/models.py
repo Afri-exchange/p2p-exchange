@@ -22,8 +22,10 @@ class Offers(models.Model):
         max_length=3, choices=CURRENCY, default=CURRENCY[0][0])
     pay_method = models.CharField(
         max_length=50, choices=METHOD_PAY, default=METHOD_PAY[0][0])
-    min_amount = models.PositiveIntegerField()
-    max_amount = models.PositiveIntegerField()
+    min_amount = models.DecimalField(max_digits=36, decimal_places=18, validators=[
+        MinValueValidator(Decimal('0.000000000000000001'), message="Ensure this value is greater than or equal to 0.000000000000000001.")])
+    max_amount = models.DecimalField(max_digits=36, decimal_places=18, validators=[
+        MinValueValidator(Decimal('0.000000000000000001'), message="Ensure this value is greater than or equal to 0.000000000000000001.")])
     margin_percent = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(100)])
     created_by = models.ForeignKey(
@@ -32,6 +34,14 @@ class Offers(models.Model):
     class Meta:
         db_table = "offers"
 
+    def validate_min_amount(self):
+        if self.min_amount > self.max_amount:
+            raise ValidationError([
+                {NON_FIELD_ERRORS: _("Minimum amount can't be greater than Maximum amount")}])
+        if self.min_amount == self.max_amount:
+            raise ValidationError([
+                {NON_FIELD_ERRORS: _("Minimum amount can't be equal to Maximum amount")}])
+
 
 class Bids(models.Model):
     STATES = (
@@ -39,7 +49,8 @@ class Bids(models.Model):
         ('ACCEPTED', 'ACCEPTED'),
         ('DECLINED', 'DECLINED'),
     )
-    amount = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=36, decimal_places=18, validators=[
+        MinValueValidator(Decimal('0.000000000000000001'), message="Ensure this value is greater than or equal to 0.000000000000000001.")])
     offer = models.ForeignKey(
         Offers, on_delete=models.CASCADE, related_name='bids')
     created_by = models.ForeignKey(
@@ -53,7 +64,7 @@ class Bids(models.Model):
         db_table = "bids"
 
     # def clean(self):
-    #     self.offer = 
+    #     self.offer =
     #     if self.amount > self.offer.max_amount:
     #         raise ValidationError(
     #             {'amount': _("Bid can't be greater than {}".format(self.offer.max_amount))})
@@ -68,4 +79,3 @@ class Bids(models.Model):
         if self.amount < self.offer.min_amount:
             raise ValidationError([
                 {NON_FIELD_ERRORS: _("Bid can't be less than {}".format(self.offer.min_amount))}])
-

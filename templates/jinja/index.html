@@ -14,11 +14,59 @@
 {% endblock %}
 
 {% block content %}
+<div class="alert alert-primary" role="alert">
+    {{ price }}
+</div>
 <div class="row">
     <div class="col-lg-6 col-md-8 col-sm-10">
         <form method="POST" class="post-form" action="/new" novalidate>
             {{ csrf_input }}
-            {% include 'jinja/includes/form.html' %}
+            {% if form.non_field_errors() %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors() %}
+                <p{% if loop.last %} class="mb-0" {% endif %}>{{ error }}</p>
+                    {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-group">
+                {{ as_crispy_field(form.fiat_currency) }}
+            </div>
+            <div class="form-group">
+                {{ as_crispy_field(form.pay_method) }}
+            </div>
+            <div class="form-row">
+                <label for="id_min_amount" class=" requiredField">
+                    Min Amount<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend" style="height: 38px;">
+                        <div class="input-group-text">ETH</div>
+                    </div>
+                    {{ as_crispy_field(form.min_amount, label_class="sr-only", field_class="") }}
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="id_max_amount" class=" requiredField">
+                    Max Amount<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend" style="height: 38px;">
+                        <div class="input-group-text">ETH</div>
+                    </div>
+                    {{ as_crispy_field(form.max_amount, label_class="sr-only", field_class="") }}
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="id_margin_percent" class=" requiredField">
+                    Margin percent<span class="asteriskField">*</span>
+                </label>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend" style="height: 38px;width:53.47px;">
+                        <div class="input-group-text" style="width:53.47px;">%</div>
+                    </div>
+                    {{ as_crispy_field(form.margin_percent, label_class="sr-only", field_class="") }}
+                </div>
+            </div>
             <button type="submit" class="btn btn-success">Submit</button>
             <a href="{{ url('offers') }}" class="btn btn-outline-secondary" role="button">Cancel</a>
         </form>
