@@ -4,7 +4,7 @@ This is a crypto exchange app
 
 **1)** Fire up your favourite console & clone this repo somewhere:
 
-__`❍ git clone https://vahiwe@bitbucket.org/afriexchange/xchange.git`__
+__`❍ git clone https://github.com/Afri-exchange/p2p-exchange.git
 
 **2)** Enter this directory:
 
